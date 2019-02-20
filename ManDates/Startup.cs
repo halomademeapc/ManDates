@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ManDates.Data;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ManDates.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,11 +36,14 @@ namespace ManDates
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddDbContext<DateDbContext>(options =>
+                options.UseSqlite("Data Source=Dates.db"));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext appDb)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext appDb, DateDbContext dateDb)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +58,7 @@ namespace ManDates
             }
 
             appDb.Database.Migrate();
+            dateDb.Database.Migrate();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
