@@ -85,7 +85,6 @@ namespace ManDates
             appDb.Database.Migrate();
             dateDb.Database.Migrate();
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
