@@ -8,13 +8,13 @@ namespace ManDates.Models.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required, MaxLength(20), StringLength(20)]
+        [Required, MaxLength(20), StringLength(20), Display(Name ="First Name")]
         public string FirstName { get; set; }
 
-        [Required, MaxLength(20), StringLength(20)]
+        [Required, MaxLength(20), StringLength(20), Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Required]
+        [Required, Display(Name = "Group")]
         public int GroupId { get; set; }
 
         public virtual Group Group { get; set; }

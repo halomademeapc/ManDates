@@ -3,14 +3,16 @@ using System;
 using ManDates.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ManDates.Migrations
 {
     [DbContext(typeof(DateDbContext))]
-    partial class DateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190221011442_scheduling")]
+    partial class scheduling
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

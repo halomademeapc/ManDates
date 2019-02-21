@@ -33,25 +33,6 @@ namespace ManDates.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Test()
-        {
-            if (!await db.Members.AnyAsync())
-            {
-                db.Groups.Add(new Group
-                {
-                    Name = "Test",
-                    Members = Enumerable.Range(0, 8).Select(e => new Member
-                    {
-                        FirstName = e.ToString(),
-                        LastName = e.ToString()
-                    }).ToList()
-                });
-                await db.SaveChangesAsync();
-            }
-
-            return View(scheduleService.GenerateAgenda(await db.Members.ToListAsync()));
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
