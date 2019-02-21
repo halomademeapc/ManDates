@@ -1,36 +1,55 @@
 ﻿@model ManDates.Models.Entities.Group
+@inject ManDates.Services.ScheduleService scheduleService
+@inject ManDates.Data.DateDbContext db
+@using Microsoft.EntityFrameworkCore
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Name;
+    int week = 0;
+    var query = Context.Request.Query["weeksElapsed"].ToString();
+    var hasWeek = int.TryParse(query, out week);
+
+    var agenda = scheduleService.GenerateAgenda(await db.Members.Where(m => m.GroupId == Model.Id).ToListAsync());
 }
 
-<h1>Details</h1>
+<h1>@Model.Name</h1>
+<small>@Html.DisplayFor(model => model.Description)</small>
 
-<div>
-    <h4>Group</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CycleStart)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CycleStart)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@if (!agenda.Any())
+{
+    <div>There is no agenda for this group.</div>
+}
+else if (!hasWeek && Model.CycleStart > DateTime.Now)
+{
+    <div>Agenda has not started for this group.</div>
+}
+else
+{
+    if (!hasWeek)
+    {
+        week = Convert.ToInt32(Math.Floor((DateTime.Now - Model.CycleStart).TotalDays / 7)) + 1;
+    }
+    var currentSchedule = agenda.FirstOrDefault(a => a.Week == (week % agenda.Max(ag => ag.Week)));
+    if (currentSchedule == null)
+    {
+        <div>Could not find an agenda for this week.</div>
+    }
+    else
+    {
+        var startDate = Model.CycleStart.AddDays(7 * week);
+        var endDate = startDate.AddDays(6);
+
+        <div>
+            <span>@startDate.ToString("MMM dd")</span>
+            <span>-</span>
+            <span>@endDate.ToString("MMM dd")</span>
+        </div>
+        <div class="list-group">
+            @foreach (var p in currentSchedule.Pairs.OrderBy(p => p.Item1.FirstName).ThenBy(p => p.Item1.LastName).ThenBy(p => p.Item2.FirstName).ThenBy(p => p.Item2.LastName))
+            {
+                var users = new List<Member> { p.Item1, p.Item2 }.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
+                <div class="list-group-item">@string.Join(" and ", users.Select(u => $"{u.FirstName} {u.LastName}"))</div>
+            }
+        </div>
+    }
+}

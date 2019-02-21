@@ -19,8 +19,7 @@ namespace ManDates.Services
                     LastName = "-"
                 });
 
-            var partySize = members.Count();
-            var combinations = GetUniqueCombinations(members);
+            var combinations = GetUniqueCombinations(workingMembers);
 
             var result = new List<WeekSchedule>();
             var remaining = combinations.Where(c => !result.SelectMany(r => r.Pairs).Contains(c));
@@ -38,9 +37,7 @@ namespace ManDates.Services
                 result.Add(new WeekSchedule
                 {
                     Week = result.Count() + 1,
-                    Pairs = pairs
-                        .Take(partySize / 2)
-                        .ToList()
+                    Pairs = pairs.ToList()
                 });
             }
 
