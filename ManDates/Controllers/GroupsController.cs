@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ManDates.Data;
 using ManDates.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ManDates.Controllers
 {
@@ -44,6 +45,7 @@ namespace ManDates.Controllers
         }
 
         // GET: Groups/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -52,7 +54,7 @@ namespace ManDates.Controllers
         // POST: Groups/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,CycleStart")] Group @group)
         {
@@ -66,6 +68,7 @@ namespace ManDates.Controllers
         }
 
         // GET: Groups/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,7 +87,7 @@ namespace ManDates.Controllers
         // POST: Groups/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CycleStart")] Group @group)
         {
@@ -117,6 +120,7 @@ namespace ManDates.Controllers
         }
 
         // GET: Groups/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,7 +139,7 @@ namespace ManDates.Controllers
         }
 
         // POST: Groups/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Delete"), Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
