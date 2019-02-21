@@ -1,4 +1,5 @@
 ﻿using ManDates.Data;
+using ManDates.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -38,6 +39,8 @@ namespace ManDates
 
             services.AddDbContext<DateDbContext>(options =>
                 options.UseSqlite("Data Source=Dates.db"));
+
+            services.AddScoped<ScheduleService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

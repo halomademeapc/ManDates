@@ -12,6 +12,5 @@ namespace ManDates.Data
 
         public DbSet<Group> Groups { get; set; }
         public DbSet<Member> Members { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
     }
 }

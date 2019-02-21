@@ -1,0 +1,15 @@
+﻿@model IEnumerable<WeekSchedule>
+@{
+    ViewData["Title"] = "Test";
+}
+
+<h1>Unique Pairs</h1>
+
+@foreach (var t in Model)
+{
+    <h3 class="mt-4">Week @t.Week</h3>
+    @foreach (var p in t.Pairs)
+    {
+        <div>@p.Item1.FirstName  and @p.Item2.FirstName</div>
+    }
+}

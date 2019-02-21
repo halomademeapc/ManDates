@@ -16,7 +16,5 @@ namespace ManDates.Models.Entities
         public string Description { get; set; }
 
         public virtual ICollection<Member> Members { get; set; }
-
-        public virtual ICollection<Schedule> Schedules { get; set; }
     }
 }
