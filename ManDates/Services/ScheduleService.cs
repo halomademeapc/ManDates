@@ -15,7 +15,7 @@ namespace ManDates.Services
             LastName = "-"
         };
 
-        public IEnumerable<WeekSchedule> GenerateAgenda(IEnumerable<Member> members)
+        public IEnumerable<WeekSchedule> GenerateAgenda(IEnumerable<Member> members, int seed)
         {
             var combinations = GetUniqueCombinations(members);
 
@@ -43,7 +43,15 @@ namespace ManDates.Services
                 });
             }
 
-            return result;
+            // shuffle
+            var rnd = new Random(seed);
+            var weeks = Enumerable.Range(1, result.Count()).OrderBy(e => rnd.Next());
+
+            return result.Zip(weeks, (s, w) => new WeekSchedule
+            {
+                Week = w,
+                Pairs = s.Pairs
+            });
         }
 
         public IEnumerable<Tuple<T, T>> GetUniqueCombinations<T>(IEnumerable<T> source) where T : class

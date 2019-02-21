@@ -9,7 +9,7 @@
     var query = Context.Request.Query["weeksElapsed"].ToString();
     var hasWeek = int.TryParse(query, out week);
 
-    var agenda = scheduleService.GenerateAgenda(await db.Members.Where(m => m.GroupId == Model.Id).ToListAsync());
+    var agenda = scheduleService.GenerateAgenda(await db.Members.Where(m => m.GroupId == Model.Id).ToListAsync(), Model.Id);
 
     bool isPlaceholder(Member m) => m.FirstName == "-" && m.LastName == "-";
 }
