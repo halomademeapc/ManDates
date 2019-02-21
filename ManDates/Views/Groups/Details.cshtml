@@ -10,10 +10,17 @@
     var hasWeek = int.TryParse(query, out week);
 
     var agenda = scheduleService.GenerateAgenda(await db.Members.Where(m => m.GroupId == Model.Id).ToListAsync());
+
+    bool isPlaceholder(Member m) => m.FirstName == "-" && m.LastName == "-";
 }
 
-<h1>@Model.Name</h1>
-<small>@Html.DisplayFor(model => model.Description)</small>
+<div class="mb-4">
+    <h1>@Model.Name</h1>
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <small>@Html.DisplayFor(model => model.Description)</small>
+    }
+</div>
 
 @if (!agenda.Any())
 {
@@ -27,9 +34,9 @@ else
 {
     if (!hasWeek)
     {
-        week = Convert.ToInt32(Math.Floor((DateTime.Now - Model.CycleStart).TotalDays / 7)) + 1;
+        week = Convert.ToInt32(Math.Floor((DateTime.Now - Model.CycleStart).TotalDays / 7));
     }
-    var currentSchedule = agenda.FirstOrDefault(a => a.Week == (week % agenda.Max(ag => ag.Week)));
+    var currentSchedule = agenda.FirstOrDefault(a => a.Week == (week % agenda.Max(ag => ag.Week)) + 1);
     if (currentSchedule == null)
     {
         <div>Could not find an agenda for this week.</div>
@@ -38,17 +45,49 @@ else
     {
         var startDate = Model.CycleStart.AddDays(7 * week);
         var endDate = startDate.AddDays(6);
+        var sortedPairs = currentSchedule.Pairs.OrderBy(p =>
+            new List<string> { p.Item1.FirstName, p.Item2.FirstName }.OrderBy(i => i).First()
+        ).ThenBy(p =>
+            new List<string> { p.Item1.LastName, p.Item2.LastName }.OrderBy(i => i).First()
+        );
 
-        <div>
-            <span>@startDate.ToString("MMM dd")</span>
-            <span>-</span>
-            <span>@endDate.ToString("MMM dd")</span>
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                @if (week > 0)
+                {
+                    <a class="btn btn-sm btn-outline-primary" asp-route-id="@Model.Id" asp-route-weeksElapsed="@(week-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                }
+            </div>
+            <div>
+                <span>@startDate.ToString("MMM dd")</span>
+                <span>-</span>
+                <span>@endDate.ToString("MMM dd")</span>
+            </div>
+            <a class="btn btn-sm btn-outline-primary" asp-route-id="@Model.Id" asp-route-weeksElapsed="@(week+1)">
+                <i class="fas fa-chevron-right"></i>
+            </a>
         </div>
+
         <div class="list-group">
-            @foreach (var p in currentSchedule.Pairs.OrderBy(p => p.Item1.FirstName).ThenBy(p => p.Item1.LastName).ThenBy(p => p.Item2.FirstName).ThenBy(p => p.Item2.LastName))
+            @foreach (var p in sortedPairs)
             {
                 var users = new List<Member> { p.Item1, p.Item2 }.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
-                <div class="list-group-item">@string.Join(" and ", users.Select(u => $"{u.FirstName} {u.LastName}"))</div>
+                if (users.Any(isPlaceholder))
+                {
+                    <div class="list-group-item">
+                        @{
+                            var user = users.First(u => !isPlaceholder(u));
+                        }
+                        @user.FirstName @user.LastName
+                        <span class="ml-1 text-muted">(Week off)</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group-item">@string.Join(" and ", users.Select(u => $"{u.FirstName} {u.LastName}"))</div>
+                }
             }
         </div>
     }

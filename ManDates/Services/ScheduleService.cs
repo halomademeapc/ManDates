@@ -9,17 +9,15 @@ namespace ManDates.Services
 {
     public class ScheduleService
     {
+        private Member placeholderMember => new Member
+        {
+            FirstName = "-",
+            LastName = "-"
+        };
+
         public IEnumerable<WeekSchedule> GenerateAgenda(IEnumerable<Member> members)
         {
-            var workingMembers = members.ToList();
-            if (workingMembers.Count() % 2 != 0)
-                workingMembers.Add(new Member
-                {
-                    FirstName = "-",
-                    LastName = "-"
-                });
-
-            var combinations = GetUniqueCombinations(workingMembers);
+            var combinations = GetUniqueCombinations(members);
 
             var result = new List<WeekSchedule>();
             var remaining = combinations.Where(c => !result.SelectMany(r => r.Pairs).Contains(c));
@@ -33,6 +31,10 @@ namespace ManDates.Services
                     if (!presentMembers.Contains(r.Item1) && !presentMembers.Contains(r.Item2))
                         pairs.Add(r);
                 });
+
+                var added = pairs.Select(p => p.Item1).Union(pairs.Select(p => p.Item2));
+                var leftovers = members.Where(m => !added.Contains(m));
+                pairs.AddRange(leftovers.Select(l => new Tuple<Member, Member>(l, placeholderMember)));
 
                 result.Add(new WeekSchedule
                 {
