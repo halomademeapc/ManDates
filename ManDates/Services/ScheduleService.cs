@@ -19,8 +19,8 @@ namespace ManDates.Services
         {
             var combinations = GetUniqueCombinations(members);
 
-            var result = new List<WeekSchedule>();
-            var remaining = combinations.Where(c => !result.SelectMany(r => r.Pairs).Contains(c));
+            var result = new List<List<Tuple<Member, Member>>>();
+            var remaining = combinations.Where(c => !result.SelectMany(r => r).Contains(c));
 
             while (remaining.Any())
             {
@@ -36,21 +36,17 @@ namespace ManDates.Services
                 var leftovers = members.Where(m => !added.Contains(m));
                 pairs.AddRange(leftovers.Select(l => new Tuple<Member, Member>(l, placeholderMember)));
 
-                result.Add(new WeekSchedule
-                {
-                    Week = result.Count() + 1,
-                    Pairs = pairs.ToList()
-                });
+                result.Add(pairs.ToList());
             }
 
             // shuffle
             var rnd = new Random(seed);
             var weeks = Enumerable.Range(1, result.Count()).OrderBy(e => rnd.Next());
 
-            return result.Zip(weeks, (s, w) => new WeekSchedule
+            return result.Zip(weeks, (p, w) => new WeekSchedule
             {
                 Week = w,
-                Pairs = s.Pairs
+                Pairs = p
             });
         }
 
