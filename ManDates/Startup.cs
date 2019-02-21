@@ -1,7 +1,6 @@
 ﻿using ManDates.Data;
 using ManDates.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,24 +44,25 @@ namespace ManDates
 
             services.AddScoped<ScheduleService>();
 
-            services.AddAuthentication(v =>
+            services.AddAuthentication()
+            .AddGoogle(o =>
             {
-                v.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
-                v.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                o.ClientId = Configuration["Authentication:Google:ClientId"];
+                o.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                o.UserInformationEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
+                o.ClaimActions.Clear();
+                o.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                o.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+                o.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+                o.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
+                o.ClaimActions.MapJsonKey("urn:google:profile", "link");
+                o.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
             })
-                .AddGoogle(o =>
-                {
-                    o.ClientId = Configuration["Authentication:Google:ClientId"];
-                    o.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-                    o.UserInformationEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
-                    o.ClaimActions.Clear();
-                    o.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-                    o.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-                    o.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
-                    o.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
-                    o.ClaimActions.MapJsonKey("urn:google:profile", "link");
-                    o.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-                });
+            .AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
