@@ -12,6 +12,7 @@
     var agenda = scheduleService.GenerateAgenda(await db.Members.Where(m => m.GroupId == Model.Id).ToListAsync(), Model.Id);
 
     bool isPlaceholder(Member m) => m.FirstName == "-" && m.LastName == "-";
+    int roundUpDivide(int dividend, int divisor) => (divisor + dividend - 1) / divisor;
 }
 
 <div class="mb-4">
@@ -36,14 +37,15 @@ else
     {
         week = Convert.ToInt32(Math.Floor((DateTime.Now - Model.CycleStart).TotalDays / 7));
     }
-    var currentSchedule = agenda.FirstOrDefault(a => a.Week == (week % agenda.Max(ag => ag.Week)) + 1);
+    var currentInterval = roundUpDivide(week + 1, Model.DurationInWeeks) % agenda.Count();
+    var currentSchedule = agenda.FirstOrDefault(a => a.Week == currentInterval);
     if (currentSchedule == null)
     {
         <div>Could not find an agenda for this week.</div>
     }
     else
     {
-        var startDate = Model.CycleStart.AddDays(7 * week);
+        var startDate = Model.CycleStart.AddDays((currentInterval - 1) * 7 * Model.DurationInWeeks);
         var endDate = startDate.AddDays((7 * Model.DurationInWeeks) - 1);
         var sortedPairs = currentSchedule.Pairs.OrderBy(p =>
             new List<string> { p.Item1.FirstName, p.Item2.FirstName }.OrderBy(i => i).First()
@@ -53,9 +55,9 @@ else
 
         <div class="d-flex justify-content-between mb-3">
             <div>
-                @if (week > 0)
+                @if (week - Model.DurationInWeeks >= 0)
                 {
-                    <a class="btn btn-sm btn-outline-primary" asp-route-id="@Model.Id" asp-route-weeksElapsed="@(week-1)">
+                    <a class="btn btn-sm btn-outline-primary" asp-route-id="@Model.Id" asp-route-weeksElapsed="@(week-Model.DurationInWeeks)">
                         <i class="fas fa-chevron-left"></i>
                     </a>
                 }
@@ -65,7 +67,7 @@ else
                 <span>-</span>
                 <span>@endDate.ToString("MMM dd")</span>
             </div>
-            <a class="btn btn-sm btn-outline-primary" asp-route-id="@Model.Id" asp-route-weeksElapsed="@(week+1)">
+            <a class="btn btn-sm btn-outline-primary" asp-route-id="@Model.Id" asp-route-weeksElapsed="@(week+Model.DurationInWeeks)">
                 <i class="fas fa-chevron-right"></i>
             </a>
         </div>
