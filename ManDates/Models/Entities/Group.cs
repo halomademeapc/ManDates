@@ -19,6 +19,12 @@ namespace ManDates.Models.Entities
         [Required, Display(Name = "Cycle Start Date")]
         public DateTime CycleStart { get; set; }
 
+        [Display(Name = "Interval Duration (Weeks)"), Range(1, 52)]
+        public int DurationInWeeks { get; set; } = 1;
+
+        [NotMapped]
+        public TimeSpan Duration => TimeSpan.FromDays(DurationInWeeks);
+
         public virtual ICollection<Member> Members { get; set; }
     }
 }

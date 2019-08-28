@@ -36,7 +36,7 @@ else
     {
         week = Convert.ToInt32(Math.Floor((DateTime.Now - Model.CycleStart).TotalDays / 7));
     }
-    var currentSchedule = agenda.FirstOrDefault(a => a.Week == (week % agenda.Max(ag => ag.Week)) + 1);
+    var currentSchedule = agenda.FirstOrDefault(a => a.Week == ((week % agenda.Max(ag => ag.Week)) / Model.DurationInWeeks) + 1);
     if (currentSchedule == null)
     {
         <div>Could not find an agenda for this week.</div>
@@ -44,7 +44,7 @@ else
     else
     {
         var startDate = Model.CycleStart.AddDays(7 * week);
-        var endDate = startDate.AddDays(6);
+        var endDate = startDate.AddDays((7 * Model.DurationInWeeks) - 1);
         var sortedPairs = currentSchedule.Pairs.OrderBy(p =>
             new List<string> { p.Item1.FirstName, p.Item2.FirstName }.OrderBy(i => i).First()
         ).ThenBy(p =>
