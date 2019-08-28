@@ -12,5 +12,12 @@ namespace ManDates.Data
 
         public DbSet<Group> Groups { get; set; }
         public DbSet<Member> Members { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Group>()
+                .Property(g => g.DurationInWeeks)
+                .HasDefaultValue(1);
+        }
     }
 }
