@@ -56,7 +56,7 @@ namespace ManDates.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,CycleStart")] Group @group)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,CycleStart,DurationInWeeks")] Group @group)
         {
             if (ModelState.IsValid)
             {
@@ -89,7 +89,7 @@ namespace ManDates.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CycleStart")] Group @group)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CycleStart,DurationInWeeks")] Group @group)
         {
             if (id != @group.Id)
             {
